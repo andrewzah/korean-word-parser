@@ -5,9 +5,6 @@ use hangeul::{get_jongseong, is_syllable};
 use lazy_static::lazy_static;
 use serde::Deserialize;
 
-mod utils;
-use utils::StringUtils;
-
 fn main() -> std::io::Result<()> {
     let file = File::open("./data/역재6 오픈 검수 - 에피소드1.csv")?;
     let mut rdr = csv::Reader::from_reader(file);
