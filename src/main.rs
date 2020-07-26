@@ -36,7 +36,7 @@ struct Record {
     translation: String,
 }
 
-// OUTPUT: csv with 3 cols: unique word, # of times spotted, original sentence(s)
+// OUTPUT: csv with cols: unique word, # of times spotted, original sentence(s), definition (if found), hanja (if found)
 //
 // 1. filter input- remove punctuation, etc,
 // 2. map into vec of words, split by space
@@ -54,17 +54,17 @@ mod tests {
 
     #[test]
     fn it_parses_verb_stem() {
+        assert_eq!(parse("받으세요").unwrap(), vec!["받다"]);
         assert_eq!(parse("그렇습니다").unwrap(), vec!["그렇다"]);
         assert_eq!(parse("지내고").unwrap(), vec!["지내다"]);
-        assert_eq!(parse("도난당했다는 것을").unwrap(), vec!["도난하다", "것"]);
+        assert_eq!(parse("도난당했다는 것을").unwrap(), vec!["도난하다"]);
         assert_eq!(parse("이루어진다").unwrap(), vec!["이루어지다"]);
-        assert_eq!(parse("나가 했습니다").unwrap(), vec!["나가다", "하다"]);
-        assert_eq!(parse("무서운 것").unwrap(), vec!["무섭다", "것"]);
+        assert_eq!(parse("무서운 것").unwrap(), vec!["무섭다"]);
     }
 
     #[test]
     fn it_parses_sentences() {
-        assert_eq!(parse("영혼은 명계에서 살 것이고").unwrap(), vec!["영혼", "명계", "사다", "것"]);
+        assert_eq!(parse("영혼은 명계에서 살 것이고").unwrap(), vec!["영혼", "명계", "사다"]);
     }
 
     #[test]
