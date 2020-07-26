@@ -8,17 +8,9 @@ use serde::Deserialize;
 mod utils;
 use utils::StringUtils;
 
-lazy_static! {
-    static ref PARTICLES1: Vec<&'static str> = vec![ "지", "군", "네", "는", "은", "이", "가", "에", "랑", "고", "자"];
-    static ref PARTICLES2: Vec<&'static str> = vec![ "고는", "니다", "구나", "군요", "께서", "한테", "에게", "에서", "이랑", "하고", "는데"];
-    static ref PARTICLES3: Vec<&'static str> = vec![ "으세요", "자마자", "습니다", ];
-}
-
-
 fn main() -> std::io::Result<()> {
     let file = File::open("./data/역재6 오픈 검수 - 에피소드1.csv")?;
     let mut rdr = csv::Reader::from_reader(file);
-
 
     for res in rdr.deserialize() {
         let record: Record = res?;
@@ -32,19 +24,6 @@ fn main() -> std::io::Result<()> {
             if word.len() == 0 {
                 continue
             }
-
-            let last = word.chars().last()
-                .expect("expected a non-empty string");
-
-            // check whole particles
-            check_particle_ending(word);
-
-            // -ㄴ
-            // if let Ok(c) = get_jongseong(&last) {
-            //     if c == 'ㄴ' {
-            //         println!("matched ㄴ in {}!", &record.translation);
-            //     }
-            // }
         }
     }
 
@@ -55,43 +34,6 @@ fn main() -> std::io::Result<()> {
 struct Record {
     #[serde(alias = "번역")]
     translation: String,
-}
-
-fn check_particle_ending(word: &str) -> bool {
-    let len = word.chars().count();
-    if len == 0 {
-        return false;
-    }
-
-    if len >= 3 {
-        let substring: String = word.chars().skip(len-3).take(3).collect();
-        println!("s3 {}: '{}'", word, substring);
-
-        if PARTICLES3.contains(&substring.as_str()) {
-            println!("{} matched p3!", substring);
-            return true
-        }
-    }
-
-    if len >= 2 {
-        let substring: String = word.chars().skip(len-2).take(2).collect();
-        println!("s2 {}: '{}'", word, substring);
-
-        if PARTICLES2.contains(&substring.as_str()) {
-            println!("{} matched p2!", substring);
-            return true
-        }
-
-        let substring: String = word.chars().skip(len-1).take(1).collect();
-        println!("s1 {}: '{}'", word, substring);
-
-        if PARTICLES1.contains(&substring.as_str()) {
-            println!("{} matched p1!", substring);
-            return true
-        }
-    }
-
-    false
 }
 
 // OUTPUT: csv with 3 cols: unique word, # of times spotted, original sentence(s)
@@ -108,7 +50,6 @@ fn parse(s: &str) -> Result<Vec<String>, ()> {
 
 #[cfg(test)]
 mod tests {
-    use hangeul::is_syllable;
     use super::*;
 
     #[test]
@@ -124,16 +65,6 @@ mod tests {
     #[test]
     fn it_parses_sentences() {
         assert_eq!(parse("영혼은 명계에서 살 것이고").unwrap(), vec!["영혼", "명계", "사다", "것"]);
-    }
-
-    #[test]
-    fn it_checks_particles() {
-        assert_eq!(check_particle_ending("그렇습니다"), true);
-        assert_eq!(check_particle_ending("지내고"), true);
-        assert_eq!(check_particle_ending("사람에"), true);
-
-        assert_eq!(check_particle_ending("거리"), false);
-        assert_eq!(check_particle_ending("사람"), false);
     }
 
     #[test]
